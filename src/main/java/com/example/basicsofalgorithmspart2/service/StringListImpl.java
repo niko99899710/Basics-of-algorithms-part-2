@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 public class StringListImpl implements StringList {
 
-    private final Integer[] storoge;
+    private Integer[] storoge;
     private int size;
 
     private StringListImpl(){
@@ -21,7 +21,7 @@ public class StringListImpl implements StringList {
 
     @Override
     public Integer add(Integer item) {
-        validateSize();
+        needAdd();
         validateItem(item);
         storoge [size++] = item;
         return item;
@@ -29,7 +29,7 @@ public class StringListImpl implements StringList {
     }
     @Override
     public Integer add(int index, Integer item) {
-        validateSize();
+        needAdd();
         validateItem(item);
         validateIndex(index);
         if ( index == size){
@@ -149,9 +149,9 @@ public class StringListImpl implements StringList {
         }
     }
 
-    private  void validateSize (){
+    private  void needAdd (){
         if(size == storoge.length) {
-            throw new FullSizeItemException();
+            grow();
         }
     }
 
@@ -161,16 +161,8 @@ public class StringListImpl implements StringList {
         }
     }
 
-    public static void sort (Integer[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            int temp = arr[i];
-            int j = i;
-            while (j > 0 && arr[j - 1] >= temp) {
-                arr[j] = arr[j - 1];
-                j--;
-            }
-            arr[j] = temp;
-        }
+    public void sort (Integer[] arr) {
+        quickSort(arr, 0, arr.length-1);
     }
 
     public static boolean contains(Integer[] arr, Integer item) {
@@ -191,6 +183,42 @@ public class StringListImpl implements StringList {
             }
         }
         return false;
+    }
+
+    private void  quickSort(Integer[] arr, int begin, int end){
+        if (begin < end) {
+            int partitionIndex = partition(arr, begin, end);
+
+            quickSort(arr, begin, partitionIndex - 1);
+            quickSort(arr, partitionIndex + 1, end);
+        }
+
+    }
+
+    private int partition(Integer[] arr, int begin, int end) {
+        int pivot = arr[end];
+        int i = (begin - 1);
+
+        for (int j = begin; j < end; j++) {
+            if (arr[j] <= pivot) {
+                i++;
+
+                swapElements(arr, i, j);
+            }
+        }
+
+        swapElements(arr, i + 1, end);
+        return i + 1;
+    }
+
+    private void swapElements(Integer[] arr, int i1, int i2) {
+        int temp = arr[i1];
+        arr[i1] = arr[i2];
+        arr[i2] = temp;
+    }
+
+    private void grow(){
+        storoge = Arrays.copyOf(storoge, size+ size/2);
     }
 
 }
